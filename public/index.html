@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Study Progress Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00d9ff">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker Registered"));
+    }
+  </script>
+</head>
+<body>
+  <!-- Enhanced Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-text">
+        <h1 class="brand-title">StudyTracker Pro</h1>
+        <span class="brand-subtitle">Master Your Learning Journey</span>
+      </div>
+    </div>
+    
+    <div class="navbar-center">
+      <div class="study-stats-mini">
+        <div class="stat-item">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-value" id="navStreak">0</span>
+          <span class="stat-label">Streak</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⏰</span>
+          <span class="stat-value" id="navHours">0h</span>
+          <span class="stat-label">Today</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🏆</span>
+          <span class="stat-value" id="navBadges">0</span>
+          <span class="stat-label">Badges</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="navbar-controls">
+      <div class="quick-actions">
+        <button id="quickAddBtn" class="nav-btn quick-add" title="Quick Add Entry">
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">Quick Add</span>
+        </button>
+        <button id="timerQuickBtn" class="nav-btn timer-quick" title="Start Timer">
+          <span class="btn-icon">▶️</span>
+          <span class="btn-text">Focus</span>
+        </button>
+      </div>
+      
+      <div class="navbar-menu">
+        <button id="themeToggle" class="nav-btn theme-btn" title="Toggle Theme">
+          <span class="btn-icon">🌙</span>
+        </button>
+        <button id="reminderToggle" class="nav-btn reminder-btn" title="Toggle Reminders">
+          <span class="btn-icon">🔔</span>
+        </button>
+        <button id="analyticsToggle" class="nav-btn analytics-btn" title="Analytics Dashboard">
+          <span class="btn-icon">📉</span>
+        </button>
+        <button id="profileBtn" class="nav-btn profile-btn" title="Profile & Settings">
+          <span class="btn-icon">👤</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Floating study icons animation -->
+    <div class="floating-icons">
+      <span class="float-icon" style="--delay: 0s;">📚</span>
+      <span class="float-icon" style="--delay: 2s;">✏️</span>
+      <span class="float-icon" style="--delay: 4s;">💡</span>
+      <span class="float-icon" style="--delay: 6s;">🎓</span>
+      <span class="float-icon" style="--delay: 8s;">🧠</span>
+    </div>
+  </nav>
+
+  <div class="container">
+    
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <h1 class="glow">📚 Study Progress Tracker</h1>
+      
+      <!-- Study Entry Form -->
+      <div class="study-form">
+        <div class="form-group">
+          <input type="date" id="date" placeholder="Date" />
+          <label for="date" class="form-label">📅 Study Date</label>
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="subject" placeholder="Subject/Topic" />
+          <label for="subject" class="form-label">📚 Subject/Topic</label>
+        </div>
+        
+        <div class="form-group">
+          <input type="number" id="hours" placeholder="Hours Studied" step="0.25" min="0" max="24" />
+          <label for="hours" class="form-label">⏰ Hours Studied</label>
+        </div>
+        
+        <div class="form-group">
+          <input type="number" id="grade" placeholder="Grade/Score (Optional)" step="0.1" min="0" max="100" />
+          <label for="grade" class="form-label">🎯 Grade/Score (Optional)</label>
+        </div>
+        
+        <div class="form-group">
+          <textarea id="notes" placeholder="Notes/Thoughts..." rows="3"></textarea>
+          <label for="notes" class="form-label">📝 Notes/Thoughts</label>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="addEntry" class="btn-glow">➕ Add Entry</button>
+        <button id="exportData" class="btn-export">📤 Export Data</button>
+        <button id="clearLogs" class="btn-danger">🗑️ Clear All Logs</button>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="search-section">
+        <h3 class="glow">🔍 Search & Filter</h3>
+        <div class="search-grid">
+          <div class="form-group">
+            <input type="text" id="searchInput" placeholder="Search logs..." />
+            <label for="searchInput" class="form-label">🔍 Search</label>
+          </div>
+          
+          <div class="form-group">
+            <select id="subjectFilter">
+              <option value="">All Subjects</option>
+            </select>
+            <label for="subjectFilter" class="form-label">📚 Filter by Subject</label>
+          </div>
+          
+          <div class="form-group">
+            <input type="date" id="dateFrom" placeholder="From Date" />
+            <label for="dateFrom" class="form-label">📅 From Date</label>
+          </div>
+          
+          <div class="form-group">
+            <input type="date" id="dateTo" placeholder="To Date" />
+            <label for="dateTo" class="form-label">📅 To Date</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="logs">
+        <h3 class="glow">📘 My Logs</h3>
+        <div id="logList"></div>
+      </div>
+    </div>
+
+    <!-- Middle Panel -->
+    <div class="middle-panel">
+      <!-- Pomodoro Timer Section -->
+      <div class="timer-section">
+        <h3 class="glow">🍅 Focus Timer</h3>
+        <div class="timer-display">
+          <div id="timerTime" class="timer-time">25:00</div>
+          <div id="timerLabel" class="timer-label">Focus Time</div>
+        </div>
+        <div class="timer-controls">
+          <button id="startTimer" class="btn-timer btn-start">▶️ Start</button>
+          <button id="pauseTimer" class="btn-timer btn-pause">⏸️ Pause</button>
+          <button id="resetTimer" class="btn-timer btn-reset">🔄 Reset</button>
+        </div>
+        <div class="timer-settings">
+          <label>Focus: <input type="number" id="focusTime" value="25" min="1" max="60"> min</label>
+          <label>Break: <input type="number" id="breakTime" value="5" min="1" max="30"> min</label>
+          <label>Long Break: <input type="number" id="longBreakTime" value="15" min="1" max="60"> min</label>
+        </div>
+        <div class="timer-stats">
+          <p>Sessions Completed: <span id="completedSessions">0</span></p>
+          <p>Total Focus Time: <span id="totalFocusTime">0h 0m</span></p>
+        </div>
+      </div>
+
+      <h3 class="glow">📈 Progress Chart</h3>
+      <canvas id="progressChart"></canvas>
+      
+      <h3 class="glow">📚 Hours by Subject</h3>
+      <canvas id="subjectChart"></canvas>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <!-- Goals Section -->
+      <div class="goals-section">
+        <h3 class="glow">🎯 Daily Goal</h3>
+        <div class="form-group">
+          <input type="number" id="dailyGoal" placeholder="Daily hours goal" step="0.5" min="0.5" max="24" />
+          <label for="dailyGoal" class="form-label">🎯 Daily Hours Goal</label>
+        </div>
+        <div class="buttons">
+          <button id="setGoal" class="btn-goal">✅ Set Goal</button>
+          <button id="resetGoal" class="btn-danger">🔄 Reset Goal</button>
+        </div>
+        <div id="goalProgress">
+          <div class="goal-bar">
+            <div id="goalProgressBar" class="goal-progress-fill"></div>
+          </div>
+          <p id="goalText">No goal set</p>
+        </div>
+      </div>
+
+      <!-- Study Streak -->
+      <div class="streak-section">
+        <h3 class="glow">🔥 Study Streak</h3>
+        <div id="streakDisplay">
+          <div class="streak-number">0</div>
+          <div class="streak-label">days</div>
+        </div>
+        <p id="streakMessage">Start studying to build your streak!</p>
+      </div>
+
+      <!-- Achievement Badges -->
+      <div class="badges-section">
+        <h3 class="glow">🏆 Achievement Badges</h3>
+        <div class="badges-header">
+          <p class="badges-description">Unlock badges by reaching study milestones!</p>
+          <button id="showAllBadges" class="btn-show-badges">View All Badges</button>
+        </div>
+        <div id="badgesList" class="badges-grid">
+          <!-- Badges will be populated by JavaScript -->
+        </div>
+        <div class="badges-progress">
+          <p>Progress: <span id="badgeProgress">0/10</span> badges earned</p>
+          <div class="progress-bar">
+            <div id="badgeProgressBar" class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="glow">📊 Summary</h3>
+      <div id="summary">
+        <p>Total Hours Studied: <span id="totalHours">00</span></p>
+        <p>Average Hours per Day: <span id="avgHours">0.00</span></p>
+        <p>Most Studied Subject: <span id="mostSubject">-</span></p>
+        <p>Least Studied Subject: <span id="leastSubject">-</span></p>
+        <p>Average Grade: <span id="avgGrade">-</span></p>
+        <p>Total Entries: <span id="totalEntries">0</span></p>
+      </div>
+
+      <div class="credits">
+        4 bugs <br>
+        <small>Study Smart, Study Hard! 💪</small>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Badges Modal -->
+  <div id="badgesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🏆 Achievement Badges</h2>
+        <button class="close-modal" onclick="closeBadgesModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="allBadgesList" class="all-badges-grid">
+          <!-- All badges will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Your Study Profile</h2>
+        <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="profileContent">
+          <!-- Profile content will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main Script -->
+  <script src="script.js"></script>
+</body>
+</html>
